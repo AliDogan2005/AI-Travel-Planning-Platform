@@ -1,5 +1,6 @@
 package com.travelplanningplatform.entity;
 
+import com.travelplanningplatform.entity.enums.TripStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -106,11 +107,3 @@ public class Trip {
         return totalBudget.divide(BigDecimal.valueOf(days), 2, java.math.RoundingMode.HALF_UP);
     }
 }
-
-enum TripStatus {
-    PLANNED,
-    IN_PROGRESS,
-    COMPLETED,
-    CANCELLED
-}
-
