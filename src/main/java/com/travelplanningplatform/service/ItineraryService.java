@@ -7,8 +7,6 @@ import com.travelplanningplatform.repository.ItineraryRepository;
 import com.travelplanningplatform.repository.TripRepository;
 import com.travelplanningplatform.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
