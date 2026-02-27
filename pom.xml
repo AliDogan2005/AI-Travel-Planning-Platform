@@ -88,13 +88,12 @@
 
         <!-- ===== PHASE 2: External API Integrations ===== -->
 
-        <!-- OpenAI API for itinerary generation -->
+        <!-- Google Gemini AI SDK for itinerary generation -->
         <dependency>
-            <groupId>com.openai</groupId>
-            <artifactId>openai-java</artifactId>
-            <version>0.16.0</version>
+            <groupId>com.google.genai</groupId>
+            <artifactId>google-genai</artifactId>
+            <version>1.0.0</version>
         </dependency>
-
         <!-- Google HTTP Client for Google Places API -->
         <dependency>
             <groupId>com.google.http-client</groupId>

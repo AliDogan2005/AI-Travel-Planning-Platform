@@ -1,5 +1,7 @@
 package com.travelplanningplatform.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.travelplanningplatform.entity.enums.TripStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Trip {
 
     @Id
@@ -27,6 +30,7 @@ public class Trip {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @NotBlank(message = "Destination is required")

@@ -31,13 +31,6 @@ public class TripService {
 
         LocalDate startDate = dto.startDate();
         LocalDate endDate = dto.endDate();
-        
-        //Because we already used annotation to check nullable in trip class.
-        /*
-        if (startDate == null || endDate == null) {
-            throw new IllegalArgumentException("Start and end dates are required");
-        }
-         */
         if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("End date must be on or after start date");
         }

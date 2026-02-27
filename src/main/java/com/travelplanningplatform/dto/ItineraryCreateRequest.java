@@ -21,6 +21,8 @@ public record ItineraryCreateRequest(
     @Positive
     BigDecimal estimatedCost,
 
-    String userNotes
+    String userNotes,
+
+    Boolean generatedByAI
 ) {
 }

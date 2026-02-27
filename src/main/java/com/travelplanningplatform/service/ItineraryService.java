@@ -29,13 +29,6 @@ public class ItineraryService {
         requireUserExists(userId);
 
         Trip trip = tripService.getTripByIdAndUser(tripId, userId);
-
-        if (dto.dayNumber() == null || dto.dayNumber() < 1) {
-            throw new IllegalArgumentException("Day number must be positive");
-        }
-        if (dto.date() == null) {
-            throw new IllegalArgumentException("Date is required");
-        }
         if (dto.title() == null || dto.title().isBlank()) {
             throw new IllegalArgumentException("Title is required");
         }
@@ -55,7 +48,7 @@ public class ItineraryService {
                 .location(dto.location())
                 .estimatedCost(dto.estimatedCost())
                 .userNotes(dto.userNotes())
-                .generatedByAI(false)
+                .generatedByAI(Boolean.TRUE.equals(dto.generatedByAI()))
                 .isLocked(false)
                 .build();
 
