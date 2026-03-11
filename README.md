@@ -57,30 +57,39 @@ CREATE USER travel_user WITH PASSWORD 'your_password';
 GRANT ALL PRIVILEGES ON DATABASE travel_planning TO travel_user;
 ```
 
-### 3. Configure Application Properties
-Create `src/main/resources/application.properties`:
-```properties
+### 3. Configure Environment Variables
+Copy the environment template and add your API keys:
+```bash
+cp .env.template .env
+```
+
+Edit `.env` file with your actual API keys:
+```bash
 # Database Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/travel_planning
-spring.datasource.username=your_db_username
-spring.datasource.password=your_db_password
-spring.datasource.driver-class-name=org.postgresql.Driver
+DATABASE_URL=jdbc:postgresql://localhost:5432/travel_planning
+DATABASE_USERNAME=your_db_username
+DATABASE_PASSWORD=your_db_password
 
-# JPA/Hibernate Configuration
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+# JWT Configuration  
+JWT_SECRET=your_very_long_and_secure_jwt_secret_key_here_minimum_256_bits
+JWT_EXPIRATION=86400000
 
-# JWT Configuration
-app.jwt.secret=your_jwt_secret_key_here
-app.jwt.expiration=86400000
+# Google Gemini AI API
+GEMINI_API_KEY=your_google_gemini_api_key_here
 
-# API Keys
-amadeus.api.key=your_amadeus_api_key
-amadeus.api.secret=your_amadeus_api_secret
-amadeus.api.base-url=https://test.api.amadeus.com
+# Amadeus Flight API
+AMADEUS_API_KEY=your_amadeus_api_key_here
+AMADEUS_API_SECRET=your_amadeus_api_secret_here
+```
 
-google.ai.api.key=your_google_ai_api_key
+**⚠️ Important: Never commit your `.env` file to version control!**
+
+Alternative: Set environment variables directly in your system:
+```bash
+export GEMINI_API_KEY="your_google_gemini_api_key"
+export AMADEUS_API_KEY="your_amadeus_api_key"
+export AMADEUS_API_SECRET="your_amadeus_api_secret"
+export JWT_SECRET="your_jwt_secret"
 ```
 
 ### 4. Build and Run
@@ -196,6 +205,26 @@ src/
     ├── application.properties
     └── static/
 ```
+
+## Security
+
+### Environment Variables
+This project uses environment variables to store sensitive information like API keys and database credentials. 
+
+**Files to keep secure:**
+- `.env` - Contains your actual API keys (never commit this)
+- `.env.template` - Template file showing required variables (safe to commit)
+
+**Getting API Keys:**
+- **Google Gemini AI**: Get your API key from [Google AI Studio](https://ai.google.dev/)
+- **Amadeus API**: Register at [Amadeus for Developers](https://developers.amadeus.com/)
+
+### Production Deployment
+For production environments, set environment variables through:
+- Heroku: Config Vars in dashboard
+- AWS: Environment variables in ECS/Elastic Beanstalk
+- Docker: Using `-e` flags or docker-compose environment section
+- Linux/Mac: Export commands in startup scripts
 
 ## Testing
 

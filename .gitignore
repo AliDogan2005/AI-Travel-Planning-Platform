@@ -51,4 +51,8 @@ Thumbs.db
 application-local.properties
 application-prod.properties
 secrets/
+.env
+*.env
+!.env.template
+application-*.properties
 
