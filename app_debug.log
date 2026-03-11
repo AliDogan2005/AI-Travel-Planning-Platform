@@ -1,0 +1,65 @@
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.3)
+
+2026-02-23T18:59:28.311+01:00  INFO 31034 --- [           main] c.t.TravelPlanningPlatformApplication    : Starting TravelPlanningPlatformApplication v0.0.1-SNAPSHOT using Java 21.0.8 with PID 31034 (/Users/alidogan/Projects/JAVA/TravelPlanningPlatform/target/TravelPlanningPlatform-0.0.1-SNAPSHOT.jar started by alidogan in /Users/alidogan/Projects/JAVA/TravelPlanningPlatform)
+2026-02-23T18:59:28.317+01:00  INFO 31034 --- [           main] c.t.TravelPlanningPlatformApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-02-23T18:59:31.926+01:00  INFO 31034 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-23T18:59:31.933+01:00  INFO 31034 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-23T18:59:32.300+01:00  INFO 31034 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 353 ms. Found 3 JPA repository interfaces.
+2026-02-23T18:59:32.441+01:00  INFO 31034 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-23T18:59:32.443+01:00  INFO 31034 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-23T18:59:32.468+01:00  INFO 31034 --- [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.travelplanningplatform.repository.ItineraryRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-23T18:59:32.470+01:00  INFO 31034 --- [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.travelplanningplatform.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-23T18:59:32.471+01:00  INFO 31034 --- [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.travelplanningplatform.repository.TripRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-02-23T18:59:32.471+01:00  INFO 31034 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 11 ms. Found 0 Redis repository interfaces.
+2026-02-23T18:59:33.586+01:00  INFO 31034 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-23T18:59:33.595+01:00  INFO 31034 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-23T18:59:33.595+01:00  INFO 31034 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2026-02-23T18:59:33.628+01:00  INFO 31034 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-23T18:59:33.630+01:00  INFO 31034 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4949 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-02-23T18:59:34.308+01:00  INFO 31034 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-23T18:59:34.433+01:00  INFO 31034 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-02-23T18:59:34.491+01:00  INFO 31034 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-23T18:59:35.054+01:00  INFO 31034 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-23T18:59:35.137+01:00  INFO 31034 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-23T18:59:35.890+01:00  INFO 31034 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@105ffc58
+2026-02-23T18:59:35.892+01:00  INFO 31034 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-23T18:59:36.038+01:00  WARN 31034 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-23T18:59:36.684+01:00  INFO 31034 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-23T18:59:36.792+01:00  INFO 31034 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-23T18:59:37.084+01:00  INFO 31034 --- [           main] o.s.boot.web.servlet.RegistrationBean    : Filter jwtFilterRegistration was not registered (disabled)
+2026-02-23T18:59:37.422+01:00  WARN 31034 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-23T18:59:37.973+01:00  INFO 31034 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@e870ac9, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6b78cbee, org.springframework.security.web.context.SecurityContextHolderFilter@64a74723, org.springframework.security.web.header.HeaderWriterFilter@2f32fe68, org.springframework.web.filter.CorsFilter@70b67841, org.springframework.security.web.authentication.logout.LogoutFilter@4ff5711b, com.travelplanningplatform.security.JwtAuthenticationFilter@1dcc0bb8, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6d13cd6d, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3446ab40, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7aa44fa2, org.springframework.security.web.session.SessionManagementFilter@73625632, org.springframework.security.web.access.ExceptionTranslationFilter@4075c0d8, org.springframework.security.web.access.intercept.AuthorizationFilter@783a35d8]
+2026-02-23T18:59:40.441+01:00  WARN 31034 --- [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-02-23T18:59:40.465+01:00  INFO 31034 --- [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-23T18:59:40.470+01:00  INFO 31034 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-23T18:59:40.475+01:00  INFO 31034 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-23T18:59:40.499+01:00  INFO 31034 --- [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-02-23T18:59:40.560+01:00 ERROR 31034 --- [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+ank.username,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [registerRequest.username,username]; arguments []; default message [username]]; default message [Username is required]] [Field error in object 'registerRequest' on field 'email': rejected value [null]; codes [NotBlank.registerRequest.email,NotBlank.email,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [registerRequest.email,email]; arguments []; default message [email]]; default message [Email is required]] [Field error in object 'registerRequest' on field 'password': rejected value [null]; codes [NotBlank.registerRequest.password,NotBlank.password,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [registerRequest.password,password]; arguments []; default message [password]]; default message [Password is required]] ]
+2026-02-23T18:59:49.202+01:00  INFO 30930 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-23T18:59:49.213+01:00  INFO 30930 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-23T18:59:49.218+01:00  INFO 30930 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

@@ -1,0 +1,5 @@
+Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)
+Maven home: /opt/homebrew/Cellar/maven/3.9.11/libexec
+Java version: 25.0.1, vendor: Oracle Corporation, runtime: /Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home
+Default locale: en_GR, platform encoding: UTF-8
+OS name: "mac os x", version: "26.3", arch: "aarch64", family: "mac"

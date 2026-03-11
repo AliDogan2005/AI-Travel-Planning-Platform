@@ -103,17 +103,21 @@
 
         <!-- ===== PHASE 3: Advanced Features ===== -->
 
-        <!-- Spring Data Redis for caching -->
+        <!-- Spring Data Redis for caching - DISABLED for now -->
+        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+        -->
 
-        <!-- Redis client (Lettuce) -->
+        <!-- Redis client (Lettuce) - DISABLED for now -->
+        <!--
         <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
         </dependency>
+        -->
 
         <!-- Resilience4j for circuit breakers and rate limiting -->
         <dependency>
@@ -130,6 +134,11 @@
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-ratelimiter</artifactId>
             <version>2.1.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
         </dependency>
 
         <!-- Spring WebFlux for async operations -->
