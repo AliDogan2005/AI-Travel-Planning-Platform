@@ -5,6 +5,8 @@ import com.travelplanningplatform.dto.external.FlightSearchRequest;
 import com.travelplanningplatform.dto.external.FlightSearchResponse;
 import com.travelplanningplatform.entity.Trip;
 import com.travelplanningplatform.exception.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -15,6 +17,8 @@ import java.util.Map;
 
 @Service
 public class FlightService {
+
+    private static final Logger log = LoggerFactory.getLogger(FlightService.class);
 
     private final AmadeusClient amadeusClient;
     private final TripService tripService;
@@ -92,7 +96,7 @@ public class FlightService {
 
         } catch (Exception e) {
             System.err.println("FlightService: Exception in searchFlightsForTripWithAirportCodes: " + e.getMessage());
-            e.printStackTrace();
+            log.error("FlightService: Exception in searchFlightsForTripWithAirportCodes", e);
             return Mono.just(new FlightSearchResponse());
         }
     }

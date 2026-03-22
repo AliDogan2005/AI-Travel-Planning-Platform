@@ -3,6 +3,7 @@ package com.travelplanningplatform.controller;
 import com.travelplanningplatform.dto.external.FlightSearchRequest;
 import com.travelplanningplatform.dto.external.FlightSearchResponse;
 import com.travelplanningplatform.entity.User;
+import com.travelplanningplatform.exception.UnauthorizedException;
 import com.travelplanningplatform.service.FlightService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -115,7 +116,7 @@ public class FlightController {
 
         if (user == null) {
             System.err.println("DEBUG: User is null - authentication failed");
-            return ResponseEntity.status(401).build();
+            throw new UnauthorizedException("Authentication required");
         }
 
         System.out.println("DEBUG: User authenticated: " + user.getUsername() + ", userId: " + user.getId());
@@ -209,7 +210,7 @@ public class FlightController {
     @GetMapping("/airports/cache/stats")
     public ResponseEntity<Map<String, Object>> getCacheStats(@AuthenticationPrincipal User user) {
         if (user == null) {
-            return ResponseEntity.status(401).build();
+            throw new UnauthorizedException("Authentication required");
         }
 
         return ResponseEntity.ok(flightService.getCacheStats());

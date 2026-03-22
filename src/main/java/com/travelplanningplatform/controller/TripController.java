@@ -4,6 +4,7 @@ import com.travelplanningplatform.dto.TripCreateRequest;
 import com.travelplanningplatform.entity.Trip;
 import com.travelplanningplatform.entity.User;
 import com.travelplanningplatform.entity.enums.TripStatus;
+import com.travelplanningplatform.exception.UnauthorizedException;
 import com.travelplanningplatform.service.TripService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class TripController {
             @Valid @RequestBody TripCreateRequest dto,
             @AuthenticationPrincipal User user) {
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("Authentication required");
         }
         Trip trip = tripService.createTrip(dto, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(trip);
@@ -37,7 +38,7 @@ public class TripController {
     @GetMapping
     public ResponseEntity<List<Trip>> getUserTrips(@AuthenticationPrincipal User user) {
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("Authentication required");
         }
         List<Trip> trips = tripService.getTripsByUser(user.getId());
         System.out.println("DEBUG: Found " + trips.size() + " trips for user " + user.getUsername());
@@ -47,6 +48,9 @@ public class TripController {
     public ResponseEntity<Trip> getTripById(
             @PathVariable Long tripId,
             @AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new UnauthorizedException("Authentication required");
+        }
         Trip trip = tripService.getTripByIdAndUser(tripId, user.getId());
         return ResponseEntity.ok(trip);
     }
@@ -54,6 +58,9 @@ public class TripController {
     public ResponseEntity<List<Trip>> getTripsByStatus(
             @PathVariable TripStatus status,
             @AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new UnauthorizedException("Authentication required");
+        }
         List<Trip> trips = tripService.getTripsByStatus(user.getId(), status);
         return ResponseEntity.ok(trips);
     }
@@ -67,6 +74,9 @@ public class TripController {
     public ResponseEntity<Void> deleteTrip(
             @PathVariable Long tripId,
             @AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new UnauthorizedException("Authentication required");
+        }
         tripService.deleteTrip(tripId, user.getId());
         return ResponseEntity.noContent().build();
     }
