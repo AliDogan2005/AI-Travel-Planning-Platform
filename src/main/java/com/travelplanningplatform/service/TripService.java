@@ -4,6 +4,7 @@ import com.travelplanningplatform.dto.TripCreateRequest;
 import com.travelplanningplatform.entity.Trip;
 import com.travelplanningplatform.entity.User;
 import com.travelplanningplatform.entity.enums.TripStatus;
+import com.travelplanningplatform.exception.ResourceNotFoundException;
 import com.travelplanningplatform.repository.TripRepository;
 import com.travelplanningplatform.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -77,7 +78,7 @@ public class TripService {
     public Trip getTripByIdAndUser(Long tripId, Long userId) {
         requireUserExists(userId);
         return tripRepository.findByIdAndUserId(tripId, userId)
-                .orElseThrow(() -> new RuntimeException("Trip not found for user"));
+                .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id: " + tripId));
     }
 
     public List<Trip> getTripsByStatus(Long userId, TripStatus status) {
@@ -96,7 +97,7 @@ public class TripService {
 
     private void requireUserExists(Long userId) {
         if (userId == null || !userRepository.existsById(userId)) {
-            throw new RuntimeException("User not found with id: " + userId);
+            throw new ResourceNotFoundException("User not found with id: " + userId);
         }
     }
 }

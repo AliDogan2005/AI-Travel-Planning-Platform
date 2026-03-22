@@ -6,6 +6,7 @@ import com.travelplanningplatform.dto.ItineraryCreateRequest;
 import com.travelplanningplatform.dto.ItineraryGenerateRequest;
 import com.travelplanningplatform.entity.Itinerary;
 import com.travelplanningplatform.entity.Trip;
+import com.travelplanningplatform.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class ItineraryGenerationService {
         long dayCount = ChronoUnit.DAYS.between(trip.getStartDate(), trip.getEndDate()) + 1;
 
         if (geminiClient == null) {
-            throw new RuntimeException("Google Gemini API service is not available. Please check your Gemini API key configuration.");
+            throw new BadRequestException("Google Gemini API service is not available. Please check your Gemini API key configuration.");
         }
 
         String prompt = buildGeminiPrompt(trip, request, dayCount);
@@ -60,13 +61,13 @@ public class ItineraryGenerationService {
             String aiResponse = response.text();
 
             if (aiResponse == null || aiResponse.isEmpty()) {
-                throw new RuntimeException("Gemini returned empty response");
+                throw new BadRequestException("Gemini returned empty response");
             }
 
             return parseAndSaveItineraries(aiResponse, trip, userId, dayCount);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate itinerary using Google Gemini: " + e.getMessage(), e);
+            throw new BadRequestException("Failed to generate itinerary using Google Gemini: " + e.getMessage(), e);
         }
     }
 
@@ -203,7 +204,7 @@ public class ItineraryGenerationService {
         if (matcher.find()) {
             return Integer.parseInt(matcher.group(1));
         }
-        throw new RuntimeException("Could not extract day number");
+        throw new BadRequestException("Could not extract day number from AI response");
     }
 
     private String extractField(String content, String startMarker, String endMarker) {

@@ -4,6 +4,8 @@ import com.travelplanningplatform.dto.AuthResponse;
 import com.travelplanningplatform.dto.LoginRequest;
 import com.travelplanningplatform.dto.RegisterRequest;
 import com.travelplanningplatform.entity.User;
+import com.travelplanningplatform.exception.BadRequestException;
+import com.travelplanningplatform.exception.ResourceNotFoundException;
 import com.travelplanningplatform.repository.UserRepository;
 import com.travelplanningplatform.util.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,7 +31,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already exists");
+            throw new BadRequestException("Email already exists");
         }
 
         User user = User.builder()
@@ -63,7 +65,7 @@ public class AuthService {
         );
 
         User user = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = jwtUtil.generateToken(user.getUsername());
 
