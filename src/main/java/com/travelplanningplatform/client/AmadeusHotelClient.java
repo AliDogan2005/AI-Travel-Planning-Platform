@@ -13,9 +13,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class AmadeusHotelClient {
@@ -205,7 +203,7 @@ public class AmadeusHotelClient {
                 String currency = "USD";
 
                 JsonNode offers = hotelOffer.path("offers");
-                if (offers.isArray() && offers.size() > 0) {
+                if (offers.isArray() && !offers.isEmpty()) {
                     JsonNode offer = offers.get(0);
                     
                     // Get price from the offer - Hotel List API returns base and total

@@ -36,8 +36,6 @@ public class AmadeusFlightClient {
             .baseUrl("https://test.api.amadeus.com")
             .build();
     }
-
-    @CircuitBreaker(name = "amadeus", fallbackMethod = "searchFlightsFallback")
     @Retry(name = "amadeus")
     public Mono<FlightSearchResponse> searchFlights(FlightSearchRequest request) {
         System.out.println("🔑 AmadeusClient: Starting flight search - " + request.originLocationCode() + " → " + request.destinationLocationCode());
@@ -106,11 +104,6 @@ public class AmadeusFlightClient {
             return Mono.just(accessToken);
         }
 
-        Map<String, String> body = new HashMap<>();
-        body.put("grant_type", "client_credentials");
-        body.put("client_id", clientId);
-        body.put("client_secret", clientSecret);
-
         return webClient.post()
             .uri("/v1/security/oauth2/token")
             .header("Content-Type", "application/x-www-form-urlencoded")
@@ -125,33 +118,5 @@ public class AmadeusFlightClient {
                 return this.accessToken;
             })
             .doOnError(error -> System.err.println("Failed to get Amadeus access token: " + error.getMessage()));
-    }
-
-    // Method to search airport locations by keyword
-    public Mono<String> searchAirports(String keyword) {
-        System.out.println("Searching airports for keyword: " + keyword);
-
-        return getAccessToken()
-            .flatMap(token -> webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                    .path("/v1/reference-data/locations")
-                    .queryParam("subType", "AIRPORT")
-                    .queryParam("keyword", keyword)
-                    .queryParam("page[limit]", 10)
-                    .build())
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .bodyToMono(String.class)
-                .onErrorReturn("")); // Return empty string on error
-    }
-
-    // Circuit breaker fallback method - returns empty response on errors
-    public Mono<FlightSearchResponse> searchFlightsFallback(FlightSearchRequest request, Exception ex) {
-        System.err.println("🔄 AmadeusClient: Circuit breaker triggered for flight search");
-        System.err.println("❌ Error: " + ex.getMessage());
-        System.err.println("💡 Returning empty flight response");
-
-        // Always return empty response for any error (no mock data)
-        return Mono.just(new FlightSearchResponse());
     }
 }
