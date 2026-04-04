@@ -1,5 +1,6 @@
 package com.travelplanningplatform.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -36,6 +37,7 @@ public class User implements UserDetails {
 
     @NotBlank(message = "Password is required")
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false)

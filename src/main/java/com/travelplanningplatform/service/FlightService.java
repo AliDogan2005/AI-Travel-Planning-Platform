@@ -1,6 +1,6 @@
 package com.travelplanningplatform.service;
 
-import com.travelplanningplatform.client.AmadeusClient;
+import com.travelplanningplatform.client.AmadeusFlightClient;
 import com.travelplanningplatform.dto.external.FlightSearchRequest;
 import com.travelplanningplatform.dto.external.FlightSearchResponse;
 import com.travelplanningplatform.entity.Trip;
@@ -20,15 +20,15 @@ public class FlightService {
 
     private static final Logger log = LoggerFactory.getLogger(FlightService.class);
 
-    private final AmadeusClient amadeusClient;
+    private final AmadeusFlightClient amadeusFlightClient;
     private final TripService tripService;
     private final AirportDataService airportDataService;
 
 
-    public FlightService(AmadeusClient amadeusClient,
-                        @Autowired(required = false) TripService tripService,
-                        AirportDataService airportDataService) {
-        this.amadeusClient = amadeusClient;
+    public FlightService(AmadeusFlightClient amadeusFlightClient,
+                         @Autowired(required = false) TripService tripService,
+                         AirportDataService airportDataService) {
+        this.amadeusFlightClient = amadeusFlightClient;
         this.tripService = tripService;
         this.airportDataService = airportDataService;
 
@@ -54,7 +54,7 @@ public class FlightService {
         System.out.println("🚀 FlightService: Delegating to AmadeusClient for flight search" +
                           (directFlightsOnly ? " (direct flights only)" : ""));
 
-        return amadeusClient.searchFlights(modifiedRequest)
+        return amadeusFlightClient.searchFlights(modifiedRequest)
             .doOnSuccess(response -> System.out.println("FlightService: Received response from AmadeusClient"))
             .doOnError(error -> System.err.println("FlightService: Error from AmadeusClient: " + error.getMessage()));
     }

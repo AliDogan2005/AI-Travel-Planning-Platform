@@ -9,6 +9,7 @@ A comprehensive Spring Boot application that helps users create smart travel iti
 - **Trip Management** - Create, update, and manage travel trips
 - **AI-Powered Itinerary Generation** - Google Gemini AI integration for smart travel recommendations
 - **Flight Search** - Real-time flight search using Amadeus API
+- **Hotel Search (Free API)** - Nearby hotels using Amadeus API
 - **Budget Tracking** - Comprehensive budget calculation and tracking
 
 ### Technical Features
@@ -138,6 +139,13 @@ GET  /api/flights/airports/country/{country} - Get airports by country
 POST /api/flights/search                     - Advanced flight search
 ```
 
+### Hotel Search
+```
+GET  /api/hotels/search                      - Search hotels by destination
+POST /api/hotels/search                      - Advanced hotel search
+GET  /api/hotels/trips/{tripId}              - Search hotels for an existing trip
+```
+
 ## API Usage Examples
 
 ### Register User
@@ -170,6 +178,12 @@ curl -X POST http://localhost:8080/api/trips \
 ### Search Flights
 ```bash
 curl "http://localhost:8080/api/flights/search?origin=Istanbul&destination=Paris&departureDate=2026-06-01&directFlightsOnly=true" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Search Hotels
+```bash
+curl "http://localhost:8080/api/hotels/search?destination=Paris&radiusMeters=4000&maxResults=15" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -258,4 +272,3 @@ For support, email aedogan2005@gmail.com.
 ---
 
 Made with love for travelers around the world
-

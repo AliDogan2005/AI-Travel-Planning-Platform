@@ -178,7 +178,7 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("Internal Server Error")
-                .message("An unexpected error occurred. Please try again later")
+                .message(ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred. Please try again later")
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
 

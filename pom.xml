@@ -125,8 +125,6 @@
             <artifactId>lettuce-core</artifactId>
         </dependency>
         -->
-
-        <!-- Resilience4j for circuit breakers and rate limiting -->
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-spring-boot3</artifactId>

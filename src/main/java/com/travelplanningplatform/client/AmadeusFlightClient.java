@@ -12,11 +12,10 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
-public class AmadeusClient {
+public class AmadeusFlightClient {
 
     private final WebClient webClient;
 
@@ -32,7 +31,7 @@ public class AmadeusClient {
     private String accessToken;
     private long tokenExpirationTime = 0;
 
-    public AmadeusClient(WebClient.Builder webClientBuilder) {
+    public AmadeusFlightClient(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder
             .baseUrl("https://test.api.amadeus.com")
             .build();
