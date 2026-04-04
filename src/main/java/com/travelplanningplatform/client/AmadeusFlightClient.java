@@ -2,7 +2,6 @@ package com.travelplanningplatform.client;
 
 import com.travelplanningplatform.dto.external.FlightSearchRequest;
 import com.travelplanningplatform.dto.external.FlightSearchResponse;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,7 +10,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
