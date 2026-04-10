@@ -28,6 +28,9 @@ public class ItineraryGenerationService {
     private final TripService tripService;
     private final Client geminiClient;
 
+    @Autowired
+    private EmailService emailService;
+
     @Value("${gemini.api.model:gemini-1.5-flash}")
     private String modelName;
 
@@ -64,7 +67,14 @@ public class ItineraryGenerationService {
                 throw new BadRequestException("Gemini returned empty response");
             }
 
-            return parseAndSaveItineraries(aiResponse, trip, userId, dayCount);
+            List<Itinerary> itineraries = parseAndSaveItineraries(aiResponse, trip, userId, dayCount);
+
+            // Send itinerary generated email
+            if (emailService != null) {
+                emailService.sendItineraryGeneratedEmail(trip.getUser(), trip.getTitle());
+            }
+
+            return itineraries;
 
         } catch (Exception e) {
             throw new BadRequestException("Failed to generate itinerary using Google Gemini: " + e.getMessage(), e);

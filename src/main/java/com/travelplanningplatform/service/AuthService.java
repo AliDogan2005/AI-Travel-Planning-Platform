@@ -8,6 +8,7 @@ import com.travelplanningplatform.exception.BadRequestException;
 import com.travelplanningplatform.exception.ResourceNotFoundException;
 import com.travelplanningplatform.repository.UserRepository;
 import com.travelplanningplatform.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    private EmailService emailService;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                       JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
@@ -48,6 +52,9 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+        if (emailService != null) {
+            emailService.sendRegistrationEmail(user);
+        }
 
         String token = jwtUtil.generateToken(user.getUsername());
 

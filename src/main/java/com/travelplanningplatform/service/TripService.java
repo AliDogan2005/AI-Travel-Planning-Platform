@@ -7,6 +7,7 @@ import com.travelplanningplatform.entity.enums.TripStatus;
 import com.travelplanningplatform.exception.ResourceNotFoundException;
 import com.travelplanningplatform.repository.TripRepository;
 import com.travelplanningplatform.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,6 +19,9 @@ public class TripService {
 
     private final TripRepository tripRepository;
     private final UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     public TripService(TripRepository tripRepository, UserRepository userRepository) {
         this.tripRepository = tripRepository;
@@ -67,7 +71,14 @@ public class TripService {
                 .budgetSpent(BigDecimal.ZERO)
                 .build();
 
-        return tripRepository.save(trip);
+        Trip savedTrip = tripRepository.save(trip);
+
+        // Send trip created email
+        if (emailService != null) {
+            emailService.sendTripCreatedEmail(user, dto.title(), dto.destination());
+        }
+
+        return savedTrip;
     }
 
     public List<Trip> getTripsByUser(Long userId) {
