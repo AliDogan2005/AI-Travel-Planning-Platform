@@ -1,7 +1,9 @@
 package com.travelplanningplatform.util;
 
-import com.travelplanningplatform.dto.EmailRequest;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access= AccessLevel.PRIVATE)
 public class EmailTemplateBuilder {
 
     public static String buildRegistrationEmail(String userName) {

@@ -29,10 +29,6 @@ public record FlightSearchResponse(
         Object validatingAirlineCodes,
         Object travelerPricings
     ) {
-        // Constructor with defaults for optional fields
-        public FlightOffer(String type, String id, String source, List<Itinerary> itineraries, Price price) {
-            this(type, id, source, null, null, null, null, null, itineraries, price, null, null, null);
-        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

@@ -4,9 +4,6 @@ import com.travelplanningplatform.client.AmadeusFlightClient;
 import com.travelplanningplatform.dto.external.FlightSearchRequest;
 import com.travelplanningplatform.dto.external.FlightSearchResponse;
 import com.travelplanningplatform.entity.Trip;
-import com.travelplanningplatform.exception.BadRequestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -17,8 +14,6 @@ import java.util.Map;
 
 @Service
 public class FlightService {
-
-    private static final Logger log = LoggerFactory.getLogger(FlightService.class);
 
     private final AmadeusFlightClient amadeusFlightClient;
     private final TripService tripService;
@@ -31,8 +26,6 @@ public class FlightService {
         this.amadeusFlightClient = amadeusFlightClient;
         this.tripService = tripService;
         this.airportDataService = airportDataService;
-
-        System.out.println("✅ FlightService: Initialized with direct airport code support");
     }
 
     public Mono<FlightSearchResponse> searchFlights(FlightSearchRequest request, boolean directFlightsOnly) {
@@ -51,58 +44,38 @@ public class FlightService {
                 request.max()
             ) : request;
 
-        System.out.println("🚀 FlightService: Delegating to AmadeusClient for flight search" +
-                          (directFlightsOnly ? " (direct flights only)" : ""));
-
-        return amadeusFlightClient.searchFlights(modifiedRequest)
-            .doOnSuccess(response -> System.out.println("FlightService: Received response from AmadeusClient"))
-            .doOnError(error -> System.err.println("FlightService: Error from AmadeusClient: " + error.getMessage()));
+        return amadeusFlightClient.searchFlights(modifiedRequest);
     }
 
 
-    public Mono<FlightSearchResponse> searchFlightsForTripWithAirportCodes(Long tripId, String originAirport,
-                                                                           String destinationAirport, Boolean directFlightsOnly, Long userId) {
-        System.out.println("✈️ FlightService: Flight search for trip " + tripId + " using airport codes: " + originAirport + " → " +
-                          (destinationAirport != null ? destinationAirport : "from trip destination") +
-                          (Boolean.TRUE.equals(directFlightsOnly) ? " (direct flights only)" : ""));
-
+    public Mono<FlightSearchResponse> searchFlightsForTripWithAirportCodes(Long tripId, String originCode,
+                                                                           String destinationCode, Boolean directFlightsOnly, Long userId) {
         try {
             Trip trip = tripService.getTripByIdAndUser(tripId, userId);
-            System.out.println("FlightService: Found trip - " + trip.getTitle() + " to " + trip.getDestination());
-
-            // Use destination airport code or default to a common airport if not provided
-            String destCode = destinationAirport != null ? destinationAirport : "CDG"; // Default fallback
 
             FlightSearchRequest request = new FlightSearchRequest(
-                originAirport,
-                destCode,
+                originCode,
+                destinationCode,
                 trip.getStartDate(),
-                null, // returnDate
+                null,
                 trip.getTravelersCount(),
-                0, // children
-                0, // infants
+                0,
+                0,
                 "ECONOMY",
-                Boolean.TRUE.equals(directFlightsOnly), // nonStop
+                Boolean.TRUE.equals(directFlightsOnly),
                 "USD",
-                10 // max
+                10
             );
 
-            System.out.println("✈️ FlightService: Making flight search: " + originAirport + " → " + destCode +
-                             " on " + trip.getStartDate() + " for " + trip.getTravelersCount() + " passengers" +
-                             (Boolean.TRUE.equals(directFlightsOnly) ? " (direct flights only)" : ""));
-
-            return searchFlights(request, directFlightsOnly)
-                .doOnSuccess(response -> System.out.println("FlightService: Flight search completed successfully"));
+            return searchFlights(request, directFlightsOnly);
 
         } catch (Exception e) {
-            System.err.println("FlightService: Exception in searchFlightsForTripWithAirportCodes: " + e.getMessage());
-            log.error("FlightService: Exception in searchFlightsForTripWithAirportCodes", e);
             return Mono.just(new FlightSearchResponse());
         }
     }
 
-    public AirportDataService.AirportInfo getAirportInfo(String iataCode) {
-        return airportDataService.getAirportInfo(iataCode).orElse(null);
+    public AirportDataService.AirportInfo getAirportInfo(String code) {
+        return airportDataService.getAirportInfo(code).orElse(null);
     }
 
     public List<AirportDataService.AirportInfo> searchAirports(String partialName) {
@@ -125,51 +98,8 @@ public class FlightService {
         return stats;
     }
 
-    /**
-     * Resolves either an airport code (like "IST") or city name (like "Istanbul") to an IATA code
-     * @param input Either a 3-letter IATA code or a city name
-     * @return The IATA code, or null if not found
-     */
-    public String resolveToAirportCode(String input) {
-        if (input == null || input.trim().isEmpty()) {
-            throw new BadRequestException("Airport code or city name is required");
-        }
-
-        String trimmedInput = input.trim();
-        System.out.println("🔍 FlightService: Resolving '" + trimmedInput + "'...");
-
-        if (trimmedInput.length() == 3 && trimmedInput.matches("[A-Za-z]{3}")) {
-            String iataCode = trimmedInput.toUpperCase();
-            if (airportDataService.getAirportInfo(iataCode).isPresent()) {
-                System.out.println("FlightService: Resolved airport code " + iataCode);
-                return iataCode;
-            } else {
-                System.out.println("FlightService: Airport code " + iataCode + " not found in database");
-                throw new BadRequestException("Airport code '" + iataCode + "' not found");
-            }
-        }
-
-        // Check if airport data is ready
-        if (!airportDataService.isDataReady()) {
-            System.err.println("FlightService: Airport data not yet loaded.");
-            throw new BadRequestException("Airport data is not yet available. Please try again later");
-        }
-
-        // Search for airports by city name
-        System.out.println("🔍 FlightService: Searching airports for city: " + trimmedInput);
-        List<AirportDataService.AirportInfo> airports = airportDataService.searchAirportsByName(trimmedInput);
-
-        System.out.println("🔍 FlightService: Found " + airports.size() + " airports for '" + trimmedInput + "'");
-
-        if (!airports.isEmpty()) {
-            // Return the first (most relevant) airport for the city
-            AirportDataService.AirportInfo primaryAirport = airports.getFirst();
-            System.out.println("FlightService: Resolved city '" + trimmedInput + "' to airport " +
-                             primaryAirport.iataCode() + " (" + primaryAirport.name() + " in " + primaryAirport.city() + ")");
-            return primaryAirport.iataCode();
-        }
-
-        throw new BadRequestException("Could not resolve '" + trimmedInput + "' to any known airport");
+    public List<String> getAllCountries() {
+        return airportDataService.getAllCountries();
     }
 }
 

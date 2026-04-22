@@ -38,7 +38,7 @@ public class HotelController {
         HotelSearchRequest request = new HotelSearchRequest(destination, radiusMeters, maxResults);
         HotelSearchResponse response = hotelService.searchHotels(request).block();
 
-        if (response == null || response.hasResults()) {
+        if (response == null || !response.hasResults()) {
             return ResponseEntity.noContent().build();
         }
 
@@ -54,7 +54,7 @@ public class HotelController {
 
         HotelSearchResponse response = hotelService.searchHotels(request).block();
 
-        if (response == null || response.hasResults()) {
+        if (response == null || !response.hasResults()) {
             return ResponseEntity.noContent().build();
         }
 
@@ -74,7 +74,7 @@ public class HotelController {
             .searchHotelsForTrip(tripId, user.getId(), radiusMeters, maxResults)
             .block();
 
-        if (response == null || response.hasResults()) {
+        if (response == null || !response.hasResults()) {
             return ResponseEntity.noContent().build();
         }
 

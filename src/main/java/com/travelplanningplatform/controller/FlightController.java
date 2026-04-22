@@ -45,43 +45,30 @@ public class FlightController {
 
     @GetMapping("/search")
     public ResponseEntity<FlightSearchResponse> searchFlights(
-            @RequestParam String origin,
-            @RequestParam String destination,
+            @RequestParam String originCode,
+            @RequestParam String destinationCode,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
             @RequestParam(defaultValue = "1") Integer passengers,
-            @RequestParam(defaultValue = "false") Boolean directFlightsOnly,
-            @AuthenticationPrincipal User user) {
+            @RequestParam(defaultValue = "false") Boolean directFlightsOnly) {
 
         try {
-            System.out.println("✈️ FlightController: Searching flights " + origin + " → " + destination +
-                             (Boolean.TRUE.equals(directFlightsOnly) ? " (direct flights only)" : ""));
-
-            // Resolve origin and destination to airport codes
-            String originAirportCode = flightService.resolveToAirportCode(origin);
-            String destinationAirportCode = flightService.resolveToAirportCode(destination);
-
-            if (originAirportCode == null) {
-                System.err.println("❌ FlightController: Could not resolve origin: " + origin);
+            if (originCode == null) {
                 return ResponseEntity.badRequest().build();
             }
 
-            if (destinationAirportCode == null) {
-                System.err.println("❌ FlightController: Could not resolve destination: " + destination);
+            if (destinationCode == null) {
                 return ResponseEntity.badRequest().build();
             }
-
-            System.out.println("✅ FlightController: Resolved " + origin + " → " + originAirportCode +
-                             ", " + destination + " → " + destinationAirportCode);
 
             // Create request with resolved airport codes
             FlightSearchRequest request = new FlightSearchRequest(
-                originAirportCode,
-                destinationAirportCode,
+                originCode,
+                destinationCode,
                 departureDate,
-                null, // returnDate
+                null,
                 passengers,
-                0, // children
-                0, // infants
+                0,
+                0,
                 "ECONOMY",
                 directFlightsOnly, // nonStop
                 "USD",
@@ -96,61 +83,35 @@ public class FlightController {
                 return ResponseEntity.noContent().build();
             }
         } catch (Exception e) {
-            System.err.println("❌ FlightController: Exception in searchFlights: " + e.getMessage());
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body(null);
         }
     }
 
     @GetMapping("/trips/{tripId}")
     public ResponseEntity<FlightSearchResponse> searchFlightsForTrip(
             @PathVariable Long tripId,
-            @RequestParam String origin,
-            @RequestParam(required = false) String destination,
+            @RequestParam String originCode,
+            @RequestParam(required = false) String destinationCode,
             @RequestParam(defaultValue = "false") Boolean directFlightsOnly,
             @AuthenticationPrincipal User user) {
 
-        System.out.println("✈️ FlightController: Trip flight search - Trip: " + tripId +
-                          ", Origin: " + origin +
-                          (destination != null ? ", Destination: " + destination : "") +
-                          (Boolean.TRUE.equals(directFlightsOnly) ? " (direct flights only)" : ""));
-
         if (user == null) {
-            System.err.println("DEBUG: User is null - authentication failed");
             throw new UnauthorizedException("Authentication required");
         }
 
-        System.out.println("DEBUG: User authenticated: " + user.getUsername() + ", userId: " + user.getId());
-
         try {
             // Resolve origin to airport code
-            String originAirportCode = flightService.resolveToAirportCode(origin);
-            if (originAirportCode == null) {
-                System.err.println("❌ FlightController: Could not resolve origin: " + origin);
+            if (originCode == null) {
                 return ResponseEntity.badRequest().build();
             }
 
-            // Resolve destination to airport code if provided
-            String destinationAirportCode = null;
-            if (destination != null) {
-                destinationAirportCode = flightService.resolveToAirportCode(destination);
-                if (destinationAirportCode == null) {
-                    System.err.println("❌ FlightController: Could not resolve destination: " + destination);
-                    return ResponseEntity.badRequest().build();
-                }
-            }
-
-            System.out.println("✅ FlightController: Resolved origin " + origin + " → " + originAirportCode +
-                             (destinationAirportCode != null ? ", destination " + destination + " → " + destinationAirportCode : ""));
-
             FlightSearchResponse response = flightService.searchFlightsForTripWithAirportCodes(
                 tripId,
-                originAirportCode,
-                destinationAirportCode,
+                originCode,
+                destinationCode,
                 directFlightsOnly,
                 user.getId()
             ).block();
-
-            System.out.println("DEBUG: FlightService returned response: " + (response != null ? "Success" : "Null"));
 
             if (response != null) {
                 return ResponseEntity.ok(response);
@@ -158,8 +119,6 @@ public class FlightController {
                 return ResponseEntity.noContent().build();
             }
         } catch (Exception e) {
-            System.err.println("DEBUG: Exception in searchFlightsForTrip: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(500).build();
         }
     }
@@ -183,9 +142,9 @@ public class FlightController {
         return ResponseEntity.ok(results);
     }
 
-    @GetMapping("/airports/{iataCode}")
-    public ResponseEntity<Object> getAirportInfo(@PathVariable String iataCode) {
-        var airportInfo = flightService.getAirportInfo(iataCode);
+    @GetMapping("/airports/{code}")
+    public ResponseEntity<Object> getAirportInfo(@PathVariable String code) {
+        var airportInfo = flightService.getAirportInfo(code);
         if (airportInfo != null) {
             return ResponseEntity.ok(airportInfo);
         } else {
@@ -219,6 +178,12 @@ public class FlightController {
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
         return ResponseEntity.ok("Flight service is working! ✈️");
+    }
+
+    @GetMapping("/airports/countries/all")
+    public ResponseEntity<List<String>> getAllCountries() {
+        List<String> countries = flightService.getAllCountries();
+        return ResponseEntity.ok(countries);
     }
 }
 

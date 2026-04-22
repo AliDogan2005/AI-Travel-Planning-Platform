@@ -33,12 +33,6 @@ public record FlightSearchRequest(
 
     Integer max
 ) {
-    // Constructor with defaults for common use cases
-    public FlightSearchRequest(String originLocationCode, String destinationLocationCode,
-                             LocalDate departureDate, Integer adults) {
-        this(originLocationCode, destinationLocationCode, departureDate, null,
-             adults, 0, 0, "ECONOMY", false, "USD", 10);
-    }
 }
 
 

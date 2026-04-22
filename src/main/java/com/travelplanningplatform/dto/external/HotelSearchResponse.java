@@ -39,5 +39,9 @@ public record HotelSearchResponse(
     public boolean hasResults() {
         return data != null && !data.isEmpty();
     }
+
+    public List<HotelOffer> getResults() {
+        return data != null ? data : List.of();
+    }
 }
 

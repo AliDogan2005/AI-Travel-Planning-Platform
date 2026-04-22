@@ -37,22 +37,27 @@ public class AmadeusHotelClient {
     }
 
     public Mono<HotelSearchResponse> searchHotels(HotelSearchRequest request) {
-        System.out.println("DEBUG: Starting hotel search for destination: " + request.destination());
         return geocodeDestination(request.destination())
-            .doOnNext(geo -> System.out.println("DEBUG: Geocoded to lat=" + geo.latitude() + ", lon=" + geo.longitude()))
             .flatMap(geoLocation -> getAccessToken()
-                .flatMap(token -> {
-                    System.out.println("DEBUG: Got Amadeus token, searching by coordinates");
-                    return searchHotelsByCoordinates(token, request, geoLocation);
-                }))
-            .onErrorResume(ex -> {
-                System.err.println("DEBUG: Error in coordinate search, falling back to city code: " + ex.getMessage());
-                return getAccessToken()
-                    .flatMap(token -> {
-                        System.out.println("DEBUG: Searching by city code fallback");
-                        return searchHotelsByCity(token, request);
-                    });
-            });
+                .flatMap(token -> searchHotelsByCoordinates(token, request, geoLocation)))
+            .onErrorResume(ex ->
+                getAccessToken()
+                    .flatMap(token ->
+                        searchHotelsByCity(token, request)
+                    )
+                    .onErrorResume(ex2 ->
+                       Mono.just(new HotelSearchResponse(new ArrayList<>(),
+                            new HotelSearchResponse.SearchMeta(
+                                request.destination(),
+                                0.0, 0.0,
+                                request.radiusMeters(),
+                                "Amadeus",
+                                0
+                            )
+                               )
+                       )
+                    )
+            );
     }
 
     private Mono<GeoLocation> geocodeDestination(String destination) {
@@ -102,12 +107,10 @@ public class AmadeusHotelClient {
             .header("User-Agent", "AI-Travel-Planning-Platform/1.0")
             .retrieve()
             .onStatus(status -> !status.is2xxSuccessful(),
-                response -> {
-                    return response.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Hotel search failed: " + " - " + body)));
-                })
+                response ->
+                   response.bodyToMono(String.class)
+                        .flatMap(body -> Mono.error(new RuntimeException("Hotel search failed: " + " - " + body))))
             .bodyToMono(JsonNode.class)
-            .doOnNext(response -> System.out.println("DEBUG: Hotel API Response: " + response.toPrettyString()))
             .map(response -> mapAmadeusResponse(response, request.destination(), geoLocation))
             .onErrorReturn(new HotelSearchResponse(new ArrayList<>(), 
                 new HotelSearchResponse.SearchMeta(
@@ -157,25 +160,18 @@ public class AmadeusHotelClient {
     private HotelSearchResponse mapAmadeusResponse(JsonNode response, String destination, GeoLocation geoLocation) {
         List<HotelSearchResponse.HotelOffer> hotels = new ArrayList<>();
 
-        System.out.println("DEBUG: Parsing Amadeus Hotel List API response");
-
         JsonNode data = response.path("data");
         if (!data.isArray()) {
-            System.out.println("DEBUG: No data array found in response");
             return new HotelSearchResponse(hotels, 
                 new HotelSearchResponse.SearchMeta(destination, geoLocation.latitude(), geoLocation.longitude(), 0, SOURCE_NAME, 0));
         }
 
-        System.out.println("DEBUG: Found " + data.size() + " hotels in response");
 
         for (JsonNode hotelOffer : data) {
-            try {
-                // Parse hotel information
                 JsonNode hotel = hotelOffer.path("hotel");
                 String hotelId = hotel.path("hotelId").asText();
                 String hotelName = hotel.path("name").asText();
-                
-                // Build address from hotel data
+
                 JsonNode addressNode = hotel.path("address");
                 StringBuilder addressBuilder = new StringBuilder();
                 JsonNode lines = addressNode.path("lines");
@@ -198,41 +194,28 @@ public class AmadeusHotelClient {
                 Double longitude = hotel.path("longitude").asDouble();
                 int rating = hotel.path("rating").asInt();
 
-                // Parse pricing information from offers
                 Double pricePerNight = null;
                 String currency = "USD";
 
                 JsonNode offers = hotelOffer.path("offers");
                 if (offers.isArray() && !offers.isEmpty()) {
                     JsonNode offer = offers.get(0);
-                    
-                    // Get price from the offer - Hotel List API returns base and total
+
                     JsonNode priceNode = offer.path("price");
                     String base = priceNode.path("base").asText(null);
                     String total = priceNode.path("total").asText(null);
                     currency = priceNode.path("currency").asText("USD");
-                    
-                    // Try to parse base or total price
+
                     if (base != null && !base.isBlank()) {
-                        try {
                             pricePerNight = Double.parseDouble(base);
-                        } catch (NumberFormatException e) {
-                            System.out.println("DEBUG: Could not parse base price: " + base);
-                        }
                     } 
                     if (pricePerNight == null && total != null && !total.isBlank()) {
-                        try {
                             pricePerNight = Double.parseDouble(total);
-                        } catch (NumberFormatException e) {
-                            System.out.println("DEBUG: Could not parse total price: " + total);
-                        }
                     }
                 }
 
                 String website = hotel.path("website").asText(null);
                 String phone = hotel.path("contact").path("phone").asText(null);
-
-                System.out.println("DEBUG: Parsed hotel - " + hotelName + " at $" + pricePerNight + " " + currency);
 
                 hotels.add(new HotelSearchResponse.HotelOffer(
                     hotelId,
@@ -248,13 +231,7 @@ public class AmadeusHotelClient {
                     pricePerNight,
                     currency
                 ));
-            } catch (Exception e) {
-                System.err.println("DEBUG: Error parsing hotel: " + e.getMessage());
-                e.printStackTrace();
-            }
         }
-
-        System.out.println("DEBUG: Total hotels parsed: " + hotels.size());
 
         return new HotelSearchResponse(hotels, 
             new HotelSearchResponse.SearchMeta(
@@ -277,9 +254,6 @@ public class AmadeusHotelClient {
         String credentials = java.util.Base64.getEncoder()
             .encodeToString((clientId + ":" + clientSecret).getBytes());
 
-        System.out.println("DEBUG: Authenticating with Amadeus API using Basic Auth");
-        System.out.println("DEBUG: Client ID: " + clientId.substring(0, Math.min(5, clientId.length())) + "***");
-
         return webClient.post()
             .uri("/v1/security/oauth2/token")
             .header("Authorization", "Basic " + credentials)
@@ -287,23 +261,20 @@ public class AmadeusHotelClient {
             .bodyValue("grant_type=client_credentials")
             .retrieve()
             .onStatus(status -> !status.is2xxSuccessful(),
-                response -> {
-                    return response.bodyToMono(String.class)
-                        .flatMap(body -> Mono.error(new RuntimeException("Amadeus auth failed: " + " - " + body)));
-                })
+                response ->
+                    response.bodyToMono(String.class)
+                        .flatMap(body -> Mono.error(new RuntimeException("Amadeus auth failed: " + " - " + body)))
+                )
             .bodyToMono(JsonNode.class)
             .map(response -> {
                 String token = response.path("access_token").asText();
                 int expiresIn = response.path("expires_in").asInt(3600);
                 tokenExpiry = System.currentTimeMillis() + (expiresIn * 1000L);
-                System.out.println("DEBUG: Successfully obtained Amadeus token. Expires in: " + expiresIn + "s");
                 return token;
-            })
-            .doOnError(error -> System.err.println("DEBUG: Amadeus authentication error: " + error.getMessage()));
+            });
     }
 
     private String getCityCode(String destination) {
-        // Simplified city code mapping
         String lower = destination.toLowerCase();
         if (lower.contains("athens")) return "ATH";
         if (lower.contains("paris")) return "PAR";
