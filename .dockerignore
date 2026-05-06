@@ -1,0 +1,18 @@
+# Build outputs
+/target/
+
+# IDE and VCS
+/.idea/
+/.git/
+/.gitignore
+
+# Local env
+.env
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Node (if added later)
+/node_modules/
+

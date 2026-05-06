@@ -104,6 +104,27 @@ mvn spring-boot:run
 
 The application will start on `http://localhost:8080`
 
+### Docker (Beginner-Friendly)
+If you prefer not to install PostgreSQL locally, you can run everything with Docker.
+
+1. Install Docker Desktop (Windows) and make sure it is running.
+2. Ensure `.env` exists (copy from `.env.template` if needed).
+3. Start the app + database:
+
+```bash
+docker compose up --build
+```
+
+To stop and remove containers:
+
+```bash
+docker compose down
+```
+
+Notes:
+- The API will still be available at `http://localhost:8080`.
+- The database runs inside Docker and is wired to the app via `docker-compose.yml`.
+
 ## API Endpoints
 
 ### Authentication

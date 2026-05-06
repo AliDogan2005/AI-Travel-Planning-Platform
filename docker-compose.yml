@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: travel_planning_db
+    environment:
+      POSTGRES_DB: travel_planning
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: travel_planning_api
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/travel_planning
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
+
