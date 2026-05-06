@@ -23,7 +23,7 @@ public class EmailTemplateBuilder {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h1>Welcome to Travel Planning Platform! 🌍</h1>
+                            <h1>Welcome to Travel Planning Platform!</h1>
                         </div>
                         <div class="content">
                             <p>Hello <strong>%s</strong>,</p>
@@ -36,7 +36,7 @@ public class EmailTemplateBuilder {
                                 <li>Track your travel budget</li>
                                 <li>Share trips with friends and family</li>
                             </ul>
-                            <p>Happy travels! 🚀</p>
+                            <p>Happy travels!</p>
                         </div>
                         <div class="footer">
                             <p>&copy; 2026 Travel Planning Platform. All rights reserved.</p>
