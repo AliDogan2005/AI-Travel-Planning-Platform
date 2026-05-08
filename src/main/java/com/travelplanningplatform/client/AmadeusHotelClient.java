@@ -22,6 +22,7 @@ public class AmadeusHotelClient {
     private static final String AMADEUS_BASE_URL = "https://test.api.amadeus.com";
 
     private final WebClient webClient;
+    private final GeocodingClient geocodingClient;
 
     @Value("${amadeus.api.key}")
     private String clientId;
@@ -32,12 +33,13 @@ public class AmadeusHotelClient {
     private String accessToken;
     private long tokenExpiry;
 
-    public AmadeusHotelClient(WebClient.Builder webClientBuilder) {
+    public AmadeusHotelClient(WebClient.Builder webClientBuilder, GeocodingClient geocodingClient) {
         this.webClient = webClientBuilder.baseUrl(AMADEUS_BASE_URL).build();
+        this.geocodingClient = geocodingClient;
     }
 
     public Mono<HotelSearchResponse> searchHotels(HotelSearchRequest request) {
-        return geocodeDestination(request.destination())
+        return geocodingClient.geocode(request.destination())
             .flatMap(geoLocation -> getAccessToken()
                 .flatMap(token -> searchHotelsByCoordinates(token, request, geoLocation)))
             .onErrorResume(ex ->
@@ -60,32 +62,7 @@ public class AmadeusHotelClient {
             );
     }
 
-    private Mono<GeoLocation> geocodeDestination(String destination) {
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder
-                .scheme("https")
-                .host("nominatim.openstreetmap.org")
-                .path("/search")
-                .queryParam("q", destination)
-                .queryParam("format", "json")
-                .queryParam("limit", 1)
-                .build())
-            .header("User-Agent", "AI-Travel-Planning-Platform/1.0")
-            .retrieve()
-            .bodyToMono(JsonNode.class)
-            .flatMap(response -> {
-                if (response.isArray() && !response.isEmpty()) {
-                    JsonNode location = response.get(0);
-                    double latitude = location.path("lat").asDouble();
-                    double longitude = location.path("lon").asDouble();
-                    String displayName = location.path("display_name").asText(destination);
-                    return Mono.just(new GeoLocation(displayName, latitude, longitude));
-                }
-                return Mono.error(new IllegalArgumentException("Could not geocode destination: " + destination));
-            });
-    }
-
-    private Mono<HotelSearchResponse> searchHotelsByCoordinates(String token, HotelSearchRequest request, GeoLocation geoLocation) {
+    private Mono<HotelSearchResponse> searchHotelsByCoordinates(String token, HotelSearchRequest request, GeocodingClient.GeoLocation geoLocation) {
         LocalDate checkInDate = LocalDate.now().plusDays(1);
         LocalDate checkOutDate = checkInDate.plusDays(3);
 
@@ -154,10 +131,10 @@ public class AmadeusHotelClient {
     }
 
     private HotelSearchResponse mapAmadeusResponse(JsonNode response, String destination) {
-        return mapAmadeusResponse(response, destination, new GeoLocation(destination, 0.0, 0.0));
+        return mapAmadeusResponse(response, destination, new GeocodingClient.GeoLocation(destination, 0.0, 0.0));
     }
 
-    private HotelSearchResponse mapAmadeusResponse(JsonNode response, String destination, GeoLocation geoLocation) {
+    private HotelSearchResponse mapAmadeusResponse(JsonNode response, String destination, GeocodingClient.GeoLocation geoLocation) {
         List<HotelSearchResponse.HotelOffer> hotels = new ArrayList<>();
 
         JsonNode data = response.path("data");
@@ -289,7 +266,5 @@ public class AmadeusHotelClient {
         // Default: try first 3 letters
         return destination.substring(0, Math.min(3, destination.length())).toUpperCase();
     }
-
-    private record GeoLocation(String displayName, double latitude, double longitude) {}
 }
 
